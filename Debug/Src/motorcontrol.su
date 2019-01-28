@@ -1,0 +1,5 @@
+dwt_stm32_delay.h:25:22:DWT_Delay_us	24	static
+motorcontrol.c:15:6:enable_motor_driver	0	static
+motorcontrol.c:19:6:disable_motor_driver	0	static
+motorcontrol.c:24:6:set_motor_dir	0	static
+motorcontrol.c:32:6:send_motor_steps	24	static
