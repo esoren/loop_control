@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
+  * File Name          : ADC.c
+  * Description        : This file provides code for the configuration
+  *                      of the ADC instances.
   ******************************************************************************
   * This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
@@ -47,62 +47,113 @@
   ******************************************************************************
   */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H__
-#define __MAIN_H__
-
 /* Includes ------------------------------------------------------------------*/
+#include "adc.h"
 
-/* USER CODE BEGIN Includes */
+#include "gpio.h"
 
-/* USER CODE END Includes */
+/* USER CODE BEGIN 0 */
 
-/* Private define ------------------------------------------------------------*/
+/* USER CODE END 0 */
 
-#define B1_Pin GPIO_PIN_13
-#define B1_GPIO_Port GPIOC
-#define USART_TX_Pin GPIO_PIN_2
-#define USART_TX_GPIO_Port GPIOA
-#define USART_RX_Pin GPIO_PIN_3
-#define USART_RX_GPIO_Port GPIOA
-#define MOTOR_EN_Pin GPIO_PIN_4
-#define MOTOR_EN_GPIO_Port GPIOA
-#define MOTOR_STEP_Pin GPIO_PIN_8
-#define MOTOR_STEP_GPIO_Port GPIOA
-#define MOTOR_DIR_Pin GPIO_PIN_9
-#define MOTOR_DIR_GPIO_Port GPIOA
-#define TMS_Pin GPIO_PIN_13
-#define TMS_GPIO_Port GPIOA
-#define TCK_Pin GPIO_PIN_14
-#define TCK_GPIO_Port GPIOA
-#define SWO_Pin GPIO_PIN_3
-#define SWO_GPIO_Port GPIOB
-#define TMC_PWR_Pin GPIO_PIN_8
-#define TMC_PWR_GPIO_Port GPIOB
-#define MOTOR_CS_Pin GPIO_PIN_9
-#define MOTOR_CS_GPIO_Port GPIOB
+ADC_HandleTypeDef hadc1;
 
-/* ########################## Assert Selection ############################## */
-/**
-  * @brief Uncomment the line below to expanse the "assert_param" macro in the 
-  *        HAL drivers code
-  */
-/* #define USE_FULL_ASSERT    1U */
+/* ADC1 init function */
+void MX_ADC1_Init(void)
+{
+  ADC_ChannelConfTypeDef sConfig;
 
-/* USER CODE BEGIN Private defines */
+    /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
+    */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.ScanConvMode = DISABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
 
-/* USER CODE END Private defines */
+    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+    */
+  sConfig.Channel = ADC_CHANNEL_0;
+  sConfig.Rank = 1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-void _Error_Handler(char *, int);
-
-#define Error_Handler() _Error_Handler(__FILE__, __LINE__)
-#ifdef __cplusplus
 }
-#endif
 
-#endif /* __MAIN_H__ */
+void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
+{
+
+  GPIO_InitTypeDef GPIO_InitStruct;
+  if(adcHandle->Instance==ADC1)
+  {
+  /* USER CODE BEGIN ADC1_MspInit 0 */
+
+  /* USER CODE END ADC1_MspInit 0 */
+    /* ADC1 clock enable */
+    __HAL_RCC_ADC1_CLK_ENABLE();
+  
+    /**ADC1 GPIO Configuration    
+    PA0-WKUP     ------> ADC1_IN0
+    PA1     ------> ADC1_IN1 
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN ADC1_MspInit 1 */
+
+  /* USER CODE END ADC1_MspInit 1 */
+  }
+}
+
+void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
+{
+
+  if(adcHandle->Instance==ADC1)
+  {
+  /* USER CODE BEGIN ADC1_MspDeInit 0 */
+
+  /* USER CODE END ADC1_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_ADC1_CLK_DISABLE();
+  
+    /**ADC1 GPIO Configuration    
+    PA0-WKUP     ------> ADC1_IN0
+    PA1     ------> ADC1_IN1 
+    */
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_0|GPIO_PIN_1);
+
+  /* USER CODE BEGIN ADC1_MspDeInit 1 */
+
+  /* USER CODE END ADC1_MspDeInit 1 */
+  }
+} 
+
+/* USER CODE BEGIN 1 */
+
+/* USER CODE END 1 */
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

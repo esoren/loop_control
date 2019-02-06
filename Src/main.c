@@ -49,12 +49,14 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "cmsis_os.h"
+#include "adc.h"
 #include "spi.h"
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
 #include "motorcontrol.h"
 #include "dwt_stm32_delay.h"
+#include "tmc2130.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -107,9 +109,11 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI1_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   enable_motor_driver();
   set_motor_dir(1);
+
 
   uint32_t result = DWT_Delay_Init();
   if(0 != result) {
@@ -117,15 +121,14 @@ int main(void)
   }
 
   uint32_t dir = 0;
+  tmc_init();
+
   while(1==1) {
 
-	if(dir == 0) {
-		dir = 1;
-	} else {
-		dir = 0;
-	}
+	send_motor_steps(3000000, 5);
+	dir ^= 1;
 	set_motor_dir(dir);
-	send_motor_steps(1000, 3000);
+
   }
 
   /* USER CODE END 2 */
