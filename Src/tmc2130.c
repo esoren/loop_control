@@ -97,10 +97,10 @@ void tmc_init(void) {
 	tmc_readwrite_register(TMC_REG_GSTAT, 0, 0);
 
 	//TOFF=4, TBL=2, HSTRT=4. HEND=0
-	tmc_readwrite_register(TMC_REG_CHOPCONF, 0x10044, 1);
+	tmc_readwrite_register(TMC_REG_CHOPCONF, 0x5010044, 1);
 
 	//IHOLD_IRUN: IHOLD=10, IRUN=31 (max. current), IHOLDDELAY=6
-	tmc_set_motor_current(3, 7, 10);
+	tmc_set_motor_current(3, 10, 10);
 
 	//approx 1 second to fully power down the motor after motion stops
 	tmc_readwrite_register(TMC_REG_TPOWERDOWN, 0x40, 1);

@@ -51,6 +51,7 @@
 #include "cmsis_os.h"
 #include "adc.h"
 #include "spi.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
@@ -110,26 +111,30 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_ADC1_Init();
+  MX_TIM1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   enable_motor_driver();
-  set_motor_dir(1);
 
 
-  uint32_t result = DWT_Delay_Init();
-  if(0 != result) {
-	  asm("NOP");	//error
-  }
+  DWT_Delay_Init();
 
-  uint32_t dir = 0;
+
+  uint8_t dir = 1;
   tmc_init();
+  uint32_t wait = 40000;
+  uint8_t move = 1;
 
   while(1==1) {
-
-	send_motor_steps(3000000, 5);
-	dir ^= 1;
-	set_motor_dir(dir);
+	  if(move == 1) {
+		  send_motor_steps(4000,wait);
+		  move = 0;
+	  }
 
   }
+
+
+
 
   /* USER CODE END 2 */
 
@@ -219,7 +224,7 @@ void SystemClock_Config(void)
 
 /**
   * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM1 interrupt took place, inside
+  * @note   This function is called  when TIM5 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
   * a global variable "uwTick" used as application time base.
   * @param  htim : TIM handle
@@ -230,7 +235,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM1) {
+  if (htim->Instance == TIM5) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
